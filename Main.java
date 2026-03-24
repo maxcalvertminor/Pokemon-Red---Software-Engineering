@@ -22,11 +22,16 @@ public class Main {
         BufferedImage viridianImage;
         BufferedImage currentMapImage;
         BufferedImage houseImage;
+        BufferedImage pokecenterInteriorImage;
+
 
         private void loadMaps() {
             try {
                 houseImage = ImageIO.read(getClass().getResource("House.png")); 
+                pokecenterInteriorImage = ImageIO.read(getClass().getResource("PokecenterInside.png"));
+
                 System.out.println(viridianImage);
+                System.out.println(pokecenterInteriorImage);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -39,6 +44,7 @@ public class Main {
         private final int SPEED = 7;
 
         private int currentMap = 0; // 0 = Pallet, 1 = PalletPokecenter, 2 = Pewter, 3 = Viridian, 4 = Pokecenter
+        private int previousMap = 0;
 
         private ArrayList<Rectangle> trails = new ArrayList<>();
         private ArrayList<Rectangle> grass = new ArrayList<>();
@@ -128,6 +134,8 @@ public class Main {
             trails.add(new Rectangle(260, 0, 40, 1000));
             pokecenter.add(new Rectangle(350, 120, 120, 120));
             trails.add(new Rectangle(0, 260, 600, 40));
+            grass.add(new Rectangle(60, 140, 200, 120));
+
         }
 
         private void Viridian() {
@@ -142,6 +150,7 @@ public class Main {
             trails.add(new Rectangle(260, 0, 40, 1000));
             pokecenter.add(new Rectangle(350, 120, 120, 120));
             trails.add(new Rectangle(0, 260, 600, 40));
+            grass.add(new Rectangle(60, 140, 200, 140));
         }
 
         private void PokecenterInside() {
@@ -155,11 +164,15 @@ public class Main {
             trails.add(new Rectangle(0, 300, 600, 40));
         }
 
+
         private void enterPokecenter() {
-            PokecenterInside();
-            playerX = 280;
-            playerY = 260;
-        }
+            previousMap = currentMap;
+    PokecenterInside();
+    playerX = 280;
+    playerY = 260;
+}
+
+
 
         // ================= DRAW =================
 
@@ -226,91 +239,119 @@ public class Main {
         }
     }
 }
-            // Enter Pokecenter (Pallet)
-            if (currentMap == 0) {
-                for (Rectangle building : pokecenter) {
-                    if (playerRect.intersects(building)) {
-                        PokecenterInsidePallet();
-                        playerX = 280;
-                        playerY = 260;
-                    }
+// Enter Pokecenter (Pallet)
+        if (currentMap == 0) {
+            for (Rectangle building : pokecenter) {
+                if (playerRect.intersects(building)) {
+                    PokecenterInsidePallet();
+                    playerX = 280;
+                    playerY = 260;
                 }
             }
+        }
 
-            // Enter Pokecenter (Viridian)
-            if (currentMap == 3) {
-                for (Rectangle building : pokecenter) {
-                    if (playerRect.intersects(building)) {
-                        enterPokecenter();
-                    }
+        // Enter Pokecenter (Viridian)
+        if (currentMap == 3) {
+            for (Rectangle building : pokecenter) {
+                if (playerRect.intersects(building)) {
+                    enterPokecenter();
                 }
             }
+        }
 
-            // Enter Pokecenter (Pewter)
-            if (currentMap == 2) {
-                for (Rectangle building : pokecenter) {
-                    if (playerRect.intersects(building)) {
-                        enterPokecenter();
-                    }
+        // Enter Pokecenter (Pewter)
+        if (currentMap == 2) {
+            for (Rectangle building : pokecenter) {
+                if (playerRect.intersects(building)) {
+                    enterPokecenter();
                 }
             }
+        }
 
-            // Exit Pokecenter (map 1 = Pallet's pokecenter)
-            if (currentMap == 1 && playerY > getHeight() - 32) {
-                Pallet();
-                playerX = 130;
-                playerY = 220;
-            }
+        // Exit Pokecenter (map 1 = Pallet's pokecenter)
+        if (currentMap == 1 && playerY > getHeight() - 32) {
+            Pallet();
+            playerX = 130;
+            playerY = 220;
+        }
 
-            // Exit Pokecenter (map 4 = Viridian/Pewter pokecenter)
-            if (currentMap == 4 && playerY > getHeight() - 32) {
-                Viridian();
-                playerX = 130;
-                playerY = 220;
-            }
+        // Exit Pokecenter (map 4 = Viridian/Pewter pokecenter)
+        if (currentMap == 4 && playerY > getHeight() - 32) {
+            Viridian();
+            playerX = 130;
+            playerY = 220;
+        }
 
-            // Pallet → Viridian (go north)
-            if (currentMap == 0 && playerY < 0) {
-                PewterCity();
-                playerY = getHeight() - 40;
-            }
+        // Pallet → Pewter (go north)
+        if (currentMap == 0 && playerY < 0) {
+            PewterCity();
+            playerY = getHeight() - 40;
+        }
 
-            // Viridian → Pewter (go north)
-            if (currentMap == 2 && playerY < 0) {
-                Viridian();
-                playerY = getHeight() - 40;
-            }
+        // Pewter → Viridian (go north)
+        if (currentMap == 2 && playerY < 0) {
+            Viridian();
+            playerY = getHeight() - 40;
+        }
 
-            // Pewter → Viridian (go south)
-            if (currentMap == 3 && playerY > getHeight() - 32) {
-                PewterCity();
-                playerY = 10;
-            }
+        // Pewter → Pallet (go south)
+        if (currentMap == 2 && playerY > getHeight() - 32) {
+            Pallet();
+            playerY = 10;
+        }
 
-            // Viridian → Pallet (go south)
-            if (currentMap == 2 && playerY > getHeight() - 32) {
-                Pallet();
-                playerY = 10;
-            }
+        // Viridian → Pewter (go south)
+        if (currentMap == 3 && playerY > getHeight() - 32) {
+            PewterCity();
+            playerY = 10;
+        }
 
-            if (currentMap == 3 && playerY < 0) {
+        // Viridian → Cerulean (go north)
+        if (currentMap == 3 && playerY < 0) {
             CeruleanCity();
             playerY = getHeight() - 40;
-            }
-           
-            if (currentMap == 5 && playerY < 0) {
-                MyNewCity();
-                playerY = getHeight() -40;
-            }
-            if (currentMap == 8 && playerY > getHeight() - 32) {
+        }
+
+        // Cerulean → MyNewCity (go north)
+        if (currentMap == 5 && playerY < 0) {
+            MyNewCity();
+            playerY = getHeight() - 40;
+        }
+
+        // MyNewCity → Cerulean (go south)
+        if (currentMap == 8 && playerY > getHeight() - 32) {
             CeruleanCity();
             playerY = 10;
-            }
-            if (currentMap == 5 && playerY > getHeight() - 32) {
-                Viridian(); playerY = 10;
-            }
+        }
 
-    
+        // Cerulean → Viridian (go south)
+        if (currentMap == 5 && playerY > getHeight() - 32) {
+            Viridian();
+            playerY = 10;
+
+            // Enter Pokecenter (MyNewCity)
+if (currentMap == 8) {
+    for (Rectangle building : pokecenter) {
+        if (playerRect.intersects(building)) {
+            enterPokecenter();
+        }
+    }
+}
+// Enter Pokecenter (MyNewCity)
+if (currentMap == 8) {
+    for (Rectangle building : pokecenter) {
+        if (playerRect.intersects(building)) {
+            enterPokecenter();
+        }
+    }
+}
+
+        // Clamp to screen
+        playerX = Math.max(0, Math.min(playerX, getWidth() - 32));
+        playerY = Math.max(-10, Math.min(playerY, getHeight()));
+
+        repaint();
+    }
             // Clamp to screen
             playerX = Math.max(0, Math.min(playerX, getWidth() - 32));
             playerY = Math.max(-10, Math.min(playerY, getHeight()));
