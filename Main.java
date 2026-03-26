@@ -4,6 +4,10 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 
 public class Main {
 
@@ -365,9 +369,34 @@ if (currentMap == 8) {
     }  // closes GamePanel
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(GameFrame::new);
+        String filepath = "Music.wav";
+        PlayMusic(filepath);
+        JOptionPane.showMessageDialog(null, "Press OK to stop playing");
+    
+        SwingUtilities.invokeLater(StartScreen::new);
     }
-
+public static void PlayMusic(String location) {
+    try 
+    {
+        File musicPath = new File(location);
+        if(musicPath.exists())
+        {
+            AudioInputStream audioInput = AudioSystem.getAudioInputStream(musicPath);
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioInput);
+            clip.start();
+    }
+    else
+    {
+        System.out.println("Can't find file");
+    }
+}
+    catch(Exception e)
+    {
+        System.out.println(e);
+    }
 }  // closes Main
+}
+
 
  
